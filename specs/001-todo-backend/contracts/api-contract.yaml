@@ -1,0 +1,175 @@
+# API Contract: Todo Backend & Database (Phase 1)
+
+## Base URL
+All endpoints are prefixed with `/api/v1`
+
+## Authentication
+All endpoints require a valid JWT token in the Authorization header:
+```
+Authorization: Bearer <jwt_token>
+```
+
+## Endpoints
+
+### POST /api/v1/tasks
+Create a new task for the authenticated user.
+
+#### Headers
+- `Authorization: Bearer <jwt_token>` (Required)
+
+#### Request Body
+```json
+{
+  "title": "String, required, max 200 chars",
+  "description": "String, optional",
+  "completed": "Boolean, optional, default false"
+}
+```
+
+#### Responses
+- `201 Created`: Task successfully created
+  ```json
+  {
+    "id": "Integer",
+    "user_id": "String",
+    "title": "String",
+    "description": "String or null",
+    "completed": "Boolean",
+    "created_at": "DateTime string"
+  }
+  ```
+- `400 Bad Request`: Invalid input data
+- `401 Unauthorized`: Invalid or missing JWT token
+- `422 Unprocessable Entity`: Validation error
+
+### GET /api/v1/tasks
+Retrieve all tasks for the authenticated user.
+
+#### Headers
+- `Authorization: Bearer <jwt_token>` (Required)
+
+#### Responses
+- `200 OK`: Successfully retrieved tasks
+  ```json
+  [
+    {
+      "id": "Integer",
+      "user_id": "String",
+      "title": "String",
+      "description": "String or null",
+      "completed": "Boolean",
+      "created_at": "DateTime string"
+    },
+    ...
+  ]
+  ```
+- `401 Unauthorized`: Invalid or missing JWT token
+
+### GET /api/v1/tasks/{id}
+Retrieve a specific task by ID.
+
+#### Headers
+- `Authorization: Bearer <jwt_token>` (Required)
+
+#### Parameters
+- `id` (Path): Task ID
+
+#### Responses
+- `200 OK`: Task found and belongs to user
+  ```json
+  {
+    "id": "Integer",
+    "user_id": "String",
+    "title": "String",
+    "description": "String or null",
+    "completed": "Boolean",
+    "created_at": "DateTime string"
+  }
+  ```
+- `401 Unauthorized`: Invalid or missing JWT token
+- `403 Forbidden`: Task does not belong to the authenticated user
+- `404 Not Found`: Task does not exist or does not belong to the authenticated user
+
+### PUT /api/v1/tasks/{id}
+Update an existing task.
+
+#### Headers
+- `Authorization: Bearer <jwt_token>` (Required)
+
+#### Parameters
+- `id` (Path): Task ID
+
+#### Request Body
+```json
+{
+  "title": "String, optional, max 200 chars",
+  "description": "String, optional",
+  "completed": "Boolean, optional"
+}
+```
+
+#### Responses
+- `200 OK`: Task successfully updated
+  ```json
+  {
+    "id": "Integer",
+    "user_id": "String",
+    "title": "String",
+    "description": "String or null",
+    "completed": "Boolean",
+    "created_at": "DateTime string"
+  }
+  ```
+- `400 Bad Request`: Invalid input data
+- `401 Unauthorized`: Invalid or missing JWT token
+- `403 Forbidden`: Task does not belong to the authenticated user
+- `404 Not Found`: Task does not exist
+- `422 Unprocessable Entity`: Validation error
+
+### PATCH /api/v1/tasks/{id}/complete
+Toggle the completion status of a task.
+
+#### Headers
+- `Authorization: Bearer <jwt_token>` (Required)
+
+#### Parameters
+- `id` (Path): Task ID
+
+#### Responses
+- `200 OK`: Task completion status successfully toggled
+  ```json
+  {
+    "id": "Integer",
+    "user_id": "String",
+    "title": "String",
+    "description": "String or null",
+    "completed": "Boolean",
+    "created_at": "DateTime string"
+  }
+  ```
+- `401 Unauthorized`: Invalid or missing JWT token
+- `403 Forbidden`: Task does not belong to the authenticated user
+- `404 Not Found`: Task does not exist
+
+### DELETE /api/v1/tasks/{id}
+Delete a specific task.
+
+#### Headers
+- `Authorization: Bearer <jwt_token>` (Required)
+
+#### Parameters
+- `id` (Path): Task ID
+
+#### Responses
+- `204 No Content`: Task successfully deleted
+- `401 Unauthorized`: Invalid or missing JWT token
+- `403 Forbidden`: Task does not belong to the authenticated user
+- `404 Not Found`: Task does not exist
+
+## Error Response Format
+All error responses (4xx, 5xx) follow this format:
+```json
+{
+  "detail": "Human-readable error message"
+}
+```
