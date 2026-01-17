@@ -12,6 +12,13 @@ A complete full-stack todo application with authentication, built using modern t
 - **Secure API**: JWT-based authentication and authorization
 - **Modern UI**: Built with Shadcn UI components
 
+## 🌐 Live Deployments
+
+- **Frontend**: [Todo App Frontend (Vercel)](https://frontend-beta-teal-20.vercel.app)
+- **Backend**: [Todo App Backend (Hugging Face)](https://sufyanalisyed-todo-full-stack.hf.space)
+
+Try out the application live! The frontend is hosted on Vercel and the backend API is deployed on Hugging Face.
+
 ## 🛠️ Tech Stack
 
 ### Frontend
