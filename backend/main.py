@@ -6,6 +6,8 @@ from config import settings
 from sqlmodel import SQLModel
 from db import engine
 from models import Task, User  # Import models to register them with SQLModel
+import threading
+from src.services.mcp_server import start_mcp_server
 
 
 # Create database tables on startup
@@ -22,8 +24,10 @@ app = FastAPI(
 
 
 @app.on_event("startup")
-def on_startup():
+async def on_startup():
     create_db_and_tables()
+    # Start MCP server in a background thread
+    start_mcp_server()
 
 
 # Configure CORS
