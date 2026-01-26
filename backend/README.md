@@ -9,6 +9,7 @@ A secure FastAPI backend for managing Todo tasks with Neon PostgreSQL database i
 - **Full CRUD Operations**: Create, Read, Update, Delete tasks
 - **Task Management**: Title, description, completion status, timestamps
 - **Secure API**: Proper validation and error handling
+- **MCP Integration**: Model Context Protocol server for AI agent integration
 
 ## API Endpoints
 
@@ -20,6 +21,22 @@ All endpoints are under `/api/v1/` prefix:
 - `PUT /tasks/{id}` - Update task details
 - `PATCH /tasks/{id}/complete` - Toggle completion status
 - `DELETE /tasks/{id}` - Delete task
+
+## MCP (Model Context Protocol) Server
+
+This backend includes an MCP (Model Context Protocol) server that exposes task operations as AI-callable tools. The MCP server runs as a background service alongside the main FastAPI application.
+
+### Available MCP Tools
+
+- `add_task`: Create a new task for the authenticated user
+- `list_tasks`: Retrieve all tasks for the authenticated user
+- `update_task`: Modify an existing task
+- `complete_task`: Mark a task as completed
+- `delete_task`: Remove a task
+
+### Usage
+
+The MCP server starts automatically when the main application starts and runs on port 8001 with stdio transport for AI agent integration.
 
 ## Requirements
 
@@ -33,7 +50,7 @@ All endpoints are under `/api/v1/` prefix:
 cd backend
 uv venv --python 3.13
 source .venv/bin/activate
-uv add fastapi sqlmodel psycopg2-binary python-jose uvicorn python-multipart pydantic pydantic-settings httpx pytest
+uv add fastapi sqlmodel psycopg2-binary python-jose uvicorn python-multipart pydantic pydantic-settings httpx pytest fastmcp
 ```
 
 2. **Configure environment variables:**

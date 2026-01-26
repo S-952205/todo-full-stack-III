@@ -57,3 +57,50 @@ def get_current_user_id(credentials: HTTPAuthorizationCredentials = Depends(secu
         )
 
     return str(user_id)
+
+
+def validate_user_access(requested_user_id: str, authenticated_user_id: str) -> bool:
+    """
+    Validate that the authenticated user has access to resources belonging to the requested user.
+
+    Args:
+        requested_user_id: The user_id associated with the resource being accessed
+        authenticated_user_id: The user_id of the currently authenticated user
+
+    Returns:
+        bool: True if access is granted, raises HTTPException if not
+    """
+    if requested_user_id != authenticated_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You can only access your own resources"
+        )
+    return True
+
+
+def verify_resource_ownership(resource: Dict[str, Any], authenticated_user_id: str) -> bool:
+    """
+    Verify that a resource belongs to the authenticated user.
+
+    Args:
+        resource: Dictionary containing the resource data (must have 'user_id' key)
+        authenticated_user_id: The user_id of the currently authenticated user
+
+    Returns:
+        bool: True if the resource belongs to the authenticated user, raises HTTPException if not
+    """
+    resource_user_id = resource.get('user_id') or resource.get('owner_id')
+
+    if not resource_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Resource does not contain user identification"
+        )
+
+    if str(resource_user_id) != str(authenticated_user_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: Resource does not belong to authenticated user"
+        )
+
+    return True
