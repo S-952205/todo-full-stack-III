@@ -14,7 +14,9 @@
       "Bash(ls -la \"frontend/src/app/\\(auth\\)/login/\" \"frontend/src/app/\\(auth\\)/signup/\")",
       "Bash(ren \"C:\\\\Projects\\\\todo-full-stack-III\\\\specs\\\\003-mcp-infrastructure\\\\asks.md\" \"tasks.md\")",
       "Bash(python -c \"from main import app; print\\(''Import successful''\\)\")",
-      "Bash(python -c \"\n# Test imports without triggering startup\nimport models\nimport db\nimport auth\nimport routes.tasks\nimport routes.auth\nprint\\(''SUCCESS: All modules import successfully''\\)\n\")"
+      "Bash(python -c \"\n# Test imports without triggering startup\nimport models\nimport db\nimport auth\nimport routes.tasks\nimport routes.auth\nprint\\(''SUCCESS: All modules import successfully''\\)\n\")",
+      "Bash(npm run dev)",
+      "Bash(xargs ls -la)"
     ]
   }
 }
