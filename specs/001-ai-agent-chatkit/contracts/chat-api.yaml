@@ -1,0 +1,244 @@
+# API Contract: AI Agent & ChatKit UI
+
+## Overview
+This document specifies the API contracts for the AI Agent & ChatKit UI feature, defining the endpoints, request/response formats, and data schemas.
+
+## Base URL
+`http://localhost:8000/api` (development) or configured base URL
+
+## Authentication
+All endpoints require JWT authentication in the Authorization header:
+```
+Authorization: Bearer {jwt_token}
+```
+
+## Endpoints
+
+### POST /chat
+Main chat endpoint that processes user messages and returns agent responses.
+
+#### Request
+```json
+{
+  "message": "Hello, can you help me create a task?",
+  "conversation_id": "uuid-string",
+  "user_id": "uuid-string"
+}
+```
+
+**Request Schema**:
+- `message`: String, required - The user's message content
+- `conversation_id`: String (UUID), optional - Existing conversation ID, or null for new conversation
+- `user_id`: String (UUID), required - The ID of the user sending the message
+
+#### Response
+```json
+{
+  "conversation_id": "uuid-string",
+  "message_id": "uuid-string",
+  "response": "Sure, I can help you create a task. What would you like to name it?",
+  "tool_calls": [
+    {
+      "id": "call_abc123",
+      "type": "function",
+      "function": {
+        "name": "create_task",
+        "arguments": "{\"name\":\"Buy groceries\",\"description\":\"Purchase milk, bread, and eggs\"}"
+      }
+    }
+  ],
+  "status": "success"
+}
+```
+
+**Response Schema**:
+- `conversation_id`: String (UUID) - The conversation ID (newly created if not provided)
+- `message_id`: String (UUID) - ID of the response message
+- `response`: String - The agent's response text
+- `tool_calls`: Array of tool call objects - Details of any tools called by the agent
+- `status`: String - Operation status ("success", "processing", "error")
+
+#### Error Responses
+- `400 Bad Request`: Invalid request format
+- `401 Unauthorized`: Missing or invalid JWT token
+- `403 Forbidden`: User attempting to access another user's conversation
+- `422 Unprocessable Entity`: Semantic validation error
+- `500 Internal Server Error`: Server-side processing error
+
+### GET /conversations
+Retrieve a list of conversations for the authenticated user.
+
+#### Request
+No request body required.
+
+#### Response
+```json
+{
+  "conversations": [
+    {
+      "id": "uuid-string",
+      "title": "Task Management Discussion",
+      "created_at": "2023-10-20T10:30:00Z",
+      "updated_at": "2023-10-20T11:45:00Z",
+      "status": "active"
+    }
+  ]
+}
+```
+
+**Response Schema**:
+- `conversations`: Array of conversation objects
+  - `id`: String (UUID) - Conversation identifier
+  - `title`: String - Auto-generated title for the conversation
+  - `created_at`: ISO 8601 datetime - When the conversation was created
+  - `updated_at`: ISO 8601 datetime - When the conversation was last updated
+  - `status`: String - Current status ("active", "archived", "deleted")
+
+#### Error Responses
+- `401 Unauthorized`: Missing or invalid JWT token
+- `500 Internal Server Error`: Server-side processing error
+
+### GET /conversations/{conversation_id}/messages
+Retrieve messages for a specific conversation.
+
+#### Path Parameters
+- `conversation_id`: String (UUID) - The ID of the conversation to retrieve messages for
+
+#### Request
+No request body required.
+
+#### Response
+```json
+{
+  "messages": [
+    {
+      "id": "uuid-string",
+      "role": "user",
+      "content": "Can you add a new task?",
+      "timestamp": "2023-10-20T10:30:00Z",
+      "tool_calls": null
+    },
+    {
+      "id": "uuid-string",
+      "role": "assistant",
+      "content": "Sure, what would you like to name the task?",
+      "timestamp": "2023-10-20T10:30:05Z",
+      "tool_calls": [
+        {
+          "id": "call_abc123",
+          "type": "function",
+          "function": {
+            "name": "get_user_input",
+            "arguments": "{}"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Response Schema**:
+- `messages`: Array of message objects
+  - `id`: String (UUID) - Message identifier
+  - `role`: String - Message sender ("user" or "assistant")
+  - `content`: String - Message content
+  - `timestamp`: ISO 8601 datetime - When the message was sent
+  - `tool_calls`: Array of tool call objects or null - Details of any tools called
+
+#### Error Responses
+- `401 Unauthorized`: Missing or invalid JWT token
+- `403 Forbidden`: User attempting to access another user's conversation
+- `404 Not Found`: Conversation does not exist
+- `500 Internal Server Error`: Server-side processing error
+
+### POST /tools/{tool_name}
+Direct tool invocation endpoint (used internally by the agent).
+
+#### Path Parameters
+- `tool_name`: String - The name of the tool to invoke
+
+#### Request
+```json
+{
+  "parameters": {
+    "name": "Buy groceries",
+    "description": "Purchase milk, bread, and eggs"
+  },
+  "user_id": "uuid-string",
+  "conversation_id": "uuid-string"
+}
+```
+
+**Request Schema**:
+- `parameters`: Object - Parameters for the tool call
+- `user_id`: String (UUID) - The ID of the user invoking the tool
+- `conversation_id`: String (UUID) - The conversation context for the tool call
+
+#### Response
+```json
+{
+  "result": {
+    "id": "task-id",
+    "name": "Buy groceries",
+    "status": "created"
+  },
+  "status": "success"
+}
+```
+
+**Response Schema**:
+- `result`: Object - Result of the tool execution
+- `status`: String - Execution status ("success", "error")
+
+#### Error Responses
+- `400 Bad Request`: Invalid tool parameters
+- `401 Unauthorized`: Missing or invalid JWT token
+- `404 Not Found`: Tool does not exist
+- `500 Internal Server Error`: Tool execution error
+
+## Data Models
+
+### Conversation
+```json
+{
+  "id": "uuid-string",
+  "user_id": "uuid-string",
+  "title": "string",
+  "created_at": "iso-datetime",
+  "updated_at": "iso-datetime",
+  "status": "active|archived|deleted"
+}
+```
+
+### Message
+```json
+{
+  "id": "uuid-string",
+  "conversation_id": "uuid-string",
+  "user_id": "uuid-string",
+  "role": "user|assistant",
+  "content": "string",
+  "timestamp": "iso-datetime",
+  "tool_calls": "array|object|null"
+}
+```
+
+### Tool Call
+```json
+{
+  "id": "string",
+  "type": "function",
+  "function": {
+    "name": "string",
+    "arguments": "json-string"
+  }
+}
+```
+
+## Security Considerations
+- All endpoints require authentication via JWT tokens
+- Users can only access their own conversations (enforced by user_id checks)
+- Input validation is performed on all request parameters
+- SQL injection prevention through parameterized queries
+- Rate limiting should be implemented to prevent abuse
