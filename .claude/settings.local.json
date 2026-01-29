@@ -17,7 +17,9 @@
       "Bash(python -c \"\n# Test imports without triggering startup\nimport models\nimport db\nimport auth\nimport routes.tasks\nimport routes.auth\nprint\\(''SUCCESS: All modules import successfully''\\)\n\")",
       "Bash(npm run dev)",
       "Bash(xargs ls -la)",
-      "Bash(.specify/scripts/bash/setup-plan.sh --json)"
+      "Bash(.specify/scripts/bash/setup-plan.sh --json)",
+      "Bash(dir /s *.py)",
+      "Bash(findstr -i \"openrouter\")"
     ]
   }
 }

@@ -12,3 +12,7 @@ python-dotenv>=1.2.1
 fastmcp>=2.14.4
 httpx>=0.28.1
 pytest>=9.0.2
+openrouter-python>=1.5.0
+openai>=1.55.0
+better-exceptions>=0.2.2
+requests>=2.32.3

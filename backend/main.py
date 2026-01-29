@@ -8,10 +8,13 @@ from db import engine
 from models import Task, User  # Import models to register them with SQLModel
 import threading
 from src.services.mcp_server import start_mcp_server
+from src.api.chat_api import router as chat_router
 
 
 # Create database tables on startup
 def create_db_and_tables():
+    from sqlmodel import SQLModel
+    from models import Task, User  # Import models to register them with SQLModel
     SQLModel.metadata.create_all(bind=engine)
 
 
@@ -43,6 +46,8 @@ app.add_middleware(
 # Include the auth and tasks routers
 app.include_router(auth.router, prefix="/api")
 app.include_router(tasks.router, prefix="/api/v1")
+# Include the chat router
+app.include_router(chat_router)
 
 
 @app.get("/health")

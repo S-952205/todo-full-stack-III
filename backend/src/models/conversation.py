@@ -2,13 +2,20 @@ from sqlmodel import SQLModel, Field
 from datetime import datetime
 from typing import Optional
 import uuid
+from enum import Enum
+
+
+class ConversationStatus(str, Enum):
+    ACTIVE = "active"
+    ARCHIVED = "archived"
+    DELETED = "deleted"
 
 
 class ConversationBase(SQLModel):
     """Base model for Conversation with shared attributes."""
-    title: str = Field(min_length=1, max_length=200)
+    title: str = Field(min_length=1, max_length=255)
     user_id: str = Field(index=True)  # Indexed for performance
-    is_active: bool = Field(default=True)
+    status: ConversationStatus = Field(default=ConversationStatus.ACTIVE)
 
 
 class Conversation(ConversationBase, table=True):
@@ -20,14 +27,14 @@ class Conversation(ConversationBase, table=True):
 
 class ConversationCreate(ConversationBase):
     """Model for creating a new conversation."""
-    title: str = Field(min_length=1, max_length=200)
+    title: str = Field(min_length=1, max_length=255)
     user_id: str
 
 
 class ConversationUpdate(SQLModel):
     """Model for updating an existing conversation."""
-    title: Optional[str] = Field(default=None, min_length=1, max_length=200)
-    is_active: Optional[bool] = Field(default=None)
+    title: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    status: Optional[ConversationStatus] = Field(default=None)
 
 
 class ConversationResponse(ConversationBase):

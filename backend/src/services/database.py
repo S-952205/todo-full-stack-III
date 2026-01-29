@@ -4,9 +4,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from sqlmodel import Session, select, func
 from typing import List, Optional
-from models import Conversation, Message, Task as ExistingTask, TaskCreate, TaskUpdate
-# Define local create classes since they're not in main models.py
-from models import ConversationBase, MessageBase
+from models import Task as ExistingTask, TaskCreate, TaskUpdate  # Import only Task models from root models.py
+# Import Conversation and Message from the src models directory
+from ..models import Conversation, Message, ConversationBase, MessageBase
 
 class ConversationCreate(ConversationBase):
     pass

@@ -79,32 +79,3 @@ class TaskResponse(TaskBase):
 class ErrorResponse(SQLModel):
     """Model for error responses."""
     detail: str
-
-
-class ConversationBase(SQLModel):
-    """Base model for Conversation with shared attributes."""
-    title: str = Field(min_length=1, max_length=200)
-    user_id: str = Field(index=True)  # Indexed for performance
-    is_active: bool = Field(default=True)
-
-
-class Conversation(ConversationBase, table=True):
-    """Conversation model representing the database table."""
-    id: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-
-
-class MessageBase(SQLModel):
-    """Base model for Message with shared attributes."""
-    conversation_id: str = Field(index=True)  # Indexed for performance
-    role: str = Field(regex=r'^(user|assistant|system)$')  # Role validation
-    content: str = Field(min_length=1, max_length=10000)
-    user_id: str = Field(index=True)  # Indexed for performance
-
-
-class Message(MessageBase, table=True):
-    """Message model representing the database table."""
-    id: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-    metadata_json: Optional[str] = Field(default=None, max_length=1000)  # Store as JSON string
